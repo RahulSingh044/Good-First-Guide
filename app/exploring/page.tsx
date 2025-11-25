@@ -1,9 +1,11 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Input } from '../components/ui/input'
 import { Search } from 'lucide-react'
 import { SkillSelector } from '../components/SkillSelector'
 import { IssueCard } from '../components/IssueCard'
+import { getFilteredRepos, FilteredReposResponse } from '../api/search/route';
+import { error } from 'console';
 
 interface Issue {
   id: number;
@@ -31,6 +33,9 @@ function Exploring() {
     );
   };
 
+  console.log("Selected Skills:", selectedSkills);
+  console.log("Search Query:", searchQuery);
+
   const filteredIssues = mockIssues.filter((issue) => {
     const lowerQuery = searchQuery.toLowerCase();
 
@@ -52,6 +57,15 @@ function Exploring() {
 
     return matchesSearch && matchesSkills;
   });
+
+  const searchResult = async () =>{
+    const result = await getFilteredRepos(selectedSkills, 1);
+    console.log(result);
+  }
+
+  useEffect(() => {
+    searchResult();
+  },[selectedSkills, searchQuery]);
 
 
   return (
@@ -96,9 +110,7 @@ function Exploring() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {filteredIssues.length === 0 ? (
-              <p className="w-7xl text-center text-muted-foreground">No issues found matching your criteria.</p>
-            ) : (
+            {
               filteredIssues.map((issue) => (
                 <IssueCard
                   key={issue.id}
@@ -106,7 +118,7 @@ function Exploring() {
                   isBookmarked={bookmarkedIssues.includes(issue.id)}
                 />
               ))
-            )}
+            }
           </div>
         </div>
       </div>

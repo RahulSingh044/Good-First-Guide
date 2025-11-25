@@ -12,7 +12,7 @@ export const Footer = () => {
               Helping developers make their first open source contributions with confidence.
             </p>
             <div className="flex gap-3">
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+              <a href="https://github.com/RahulSingh044/Good-First-Guide" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                 <Github className="w-5 h-5" />
               </a>
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
@@ -109,7 +109,7 @@ export const Footer = () => {
         {/* Bottom bar */}
         <div className="pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>© 2024 Good First Guide. All rights reserved.</p>
+            <p>© 2025 Good First Guide. All rights reserved.</p>
             <p className="flex items-center gap-1">
               Made with <Heart className="w-4 h-4 text-red-500 fill-current" /> for the open source community
             </p>
