@@ -33,11 +33,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="light">
-        <Theme>
-          <Navbar />
-          {children}
-          <Footer />
-        </Theme>
+          <Theme>
+            <Navbar />
+            {children}
+            <Footer />
+          </Theme>
         </ThemeProvider>
       </body>
     </html>

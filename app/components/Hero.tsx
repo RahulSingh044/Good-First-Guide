@@ -50,7 +50,7 @@ export const Hero = () => {
                         <Button
                             size="lg"
                             variant="outline"
-                            className="text-lg px-8 h-14 border-2 hover:bg-secondary transition-all duration-300"
+                            className="text-lg px-8 h-14 border-2 hover:bg-secondary hover:text-black transition-all duration-300 cursor-pointer"
                             onClick={() => scrollToSection("guide")}
                         >
                             <BookOpen className="w-5 h-5 mr-2" />
