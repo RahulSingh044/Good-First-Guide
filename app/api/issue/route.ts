@@ -1,4 +1,4 @@
-interface Issue {
+export interface Issue {
   id: number;
   number: number;
   title: string;
@@ -29,6 +29,8 @@ export async function getGoodFirstIssue(
 
     const res = await fetch(url, {
         headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_PAT}`,
+            "User-Agent": "RahulIssueFinderApp",
             Accept: "application/vnd.github+json",
         },
         next: { revalidate: 3600 },

@@ -55,14 +55,6 @@ export const IssueCard = ({
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {labels.map((label) => (
-          <Badge key={label} variant="secondary" className="text-xs">
-            {label}
-          </Badge>
-        ))}
-      </div>
-
       <div className="pt-2">
         <Button
           variant="outline"

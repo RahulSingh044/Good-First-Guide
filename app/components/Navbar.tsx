@@ -10,6 +10,7 @@ import { loginWithGithub } from '@/lib/auth';
 import { useRouter } from 'next/navigation';;
 import { logoutUser } from '@/lib/auth';
 import { useEffect } from 'react';
+import { NotificationDropdown } from './NotificationModal';
 
 function Navbar() {
 
@@ -47,8 +48,8 @@ function Navbar() {
                     {!loading && (
                         loggedIn ? (
                             <>
-                            <Bell className="h-5 w-5 cursor-pointer hover:text-foreground transition-colors" />
-                                <Link href={`/profile/${user.displayName}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                            <NotificationDropdown />
+                                <Link href={`/profile/${user.uid}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                                     <Avatar className="h-8 w-8">
                                         <AvatarImage src={user.photoURL} />
                                     </Avatar>

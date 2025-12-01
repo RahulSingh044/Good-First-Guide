@@ -8,6 +8,7 @@ import { ContributionCard } from "../../components/ContributionCard";
 import { Github, Mail, Calendar, Bookmark, GitPullRequest } from "lucide-react";
 import { useAuth } from "@/app/hooks/useAuth";
 import { useEffect } from "react";
+import ProfileSkeleton from "@/app/components/ProfileLoadingSkeleton";
 
 interface Contribution {
   id: Number,
@@ -58,7 +59,7 @@ const Profile = () => {
   if (!user) {
     return (
       <>
-        <p>Loading</p>
+        <ProfileSkeleton />
       </>
     )
   }

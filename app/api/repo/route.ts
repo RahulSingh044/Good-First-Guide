@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 interface SearchReposResponse {
     total_count: number;
     incomplete_results: boolean;
@@ -40,6 +41,8 @@ export async function searchRepos(
 
     const res = await fetch(url, {
         headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_PAT}`,
+            "User-Agent": "RahulIssueFinderApp",
             Accept: "application/vnd.github+json",
         },
         next: { revalidate: 3600 },

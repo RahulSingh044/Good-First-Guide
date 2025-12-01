@@ -1,129 +1,122 @@
 "use client";
-import React, { useEffect, useState } from 'react'
-import { Input } from '../components/ui/input'
-import { Search } from 'lucide-react'
-import { SkillSelector } from '../components/SkillSelector'
-import { IssueCard } from '../components/IssueCard'
-import { getFilteredRepos, FilteredReposResponse } from '../api/search/route';
-import { error } from 'console';
+import { useState, useEffect } from "react";
+import { Input } from "../components/ui/input";
+import { Search } from "lucide-react";
+import { IssueCard } from "../components/IssueCard";
+import { SkillSelector } from "../components/SkillSelector";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "../components/ui/pagination";
+import { fetchIssues } from "../actions/getRepo";
+import ExploreSkeleton from "../components/IssueExplorerSkeleton";
 
-interface Issue {
-  id: number;
-  title: string;
-  repository: string;
-  description: string;
-  labels: string[];
-  stars: number;
-  url: string;
-  isBookmarked?: boolean;
-}
-
-const mockIssues: Issue[] = [];
-
-function Exploring() {
+const IssueExplorer = () => {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [bookmarkedIssues, setBookmarkedIssues] = useState<number[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const handleSkillToggle = (skill: string) => {
-    setSelectedSkills((prev) =>
-      prev.includes(skill)
-        ? prev.filter((s) => s !== skill)
-        : [...prev, skill]
-    );
-  };
-
-  console.log("Selected Skills:", selectedSkills);
-  console.log("Search Query:", searchQuery);
-
-  const filteredIssues = mockIssues.filter((issue) => {
-    const lowerQuery = searchQuery.toLowerCase();
-
-    const matchesSearch =
-      searchQuery === "" ||
-      issue?.title?.toLowerCase().includes(lowerQuery) ||
-      issue?.description?.toLowerCase().includes(lowerQuery) ||
-      issue?.labels?.some((label) =>
-        label.toLowerCase().includes(lowerQuery)
-      );
-
-    const matchesSkills =
-      selectedSkills.length === 0 ||
-      selectedSkills.some((skill) =>
-        issue?.labels?.some((label) =>
-          label.toLowerCase().includes(skill.toLowerCase())
-        )
-      );
-
-    return matchesSearch && matchesSkills;
-  });
-
-  const searchResult = async () =>{
-    const result = await getFilteredRepos(selectedSkills, 1);
-    console.log(result);
-  }
+  const [issues, setIssues] = useState<any[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    searchResult();
-  },[selectedSkills, searchQuery]);
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res = await fetchIssues(selectedSkills, currentPage);
 
+        setIssues(res.issues);
+        setTotalPages(res.pagination.totalPages);
+        setTotalResults(res.totalSearchResults);
+      } catch (e) {
+        console.error(e);
+        setIssues([]);
+      }
+      setLoading(false);
+    };
+
+    load();
+  }, [selectedSkills, currentPage]);
 
   return (
-    <section id="explore" className="py-20 px-4">
+    <section className="py-20 px-4 bg-linear-to-b from-background to-secondary/30">
       <div className="container mx-auto max-w-7xl space-y-12">
-        <div className="text-center space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold">
-            Explore <span className="text-primary">Issues</span>
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Filter by your skills and search for issues that match your interests
-          </p>
-        </div>
 
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
-            type="text"
-            placeholder="Search by keywords (e.g., 'authentication', 'API', 'frontend')"
+            placeholder="Search issues"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-14 text-lg shadow-lg rounded-4xl"
+            className="pl-12 h-14 text-lg shadow-lg"
           />
         </div>
 
         <SkillSelector
           selectedSkills={selectedSkills}
-          onSkillToggle={handleSkillToggle}
+          onSkillToggle={(skill) => {
+            setSelectedSkills((prev) =>
+              prev.includes(skill)
+                ? prev.filter((s) => s !== skill)
+                : [...prev, skill]
+            );
+            setCurrentPage(1);
+          }}
         />
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            {filteredIssues.length !== 0 ? (
-              <h3 className="text-2xl font-semibold">
-                {filteredIssues.length}Issues Found
-              </h3>
-            ) : (
-              <h3 className="text-2xl font-semibold">
+        {loading ? (
+          <ExploreSkeleton />
+        ) : (
+          <>
+            {/* <h3 className="text-2xl font-semibold">
+              {issues.length} of {totalResults} Issues Found
+            </h3> */}
 
-              </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              {issues.map((issue) => (
+                <IssueCard key={issue.id} {...issue} />
+              ))}
+            </div>
+
+            {issues.length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                No issues found matching your criteria.
+              </div>
             )}
-          </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {
-              filteredIssues.map((issue) => (
-                <IssueCard
-                  key={issue.id}
-                  {...issue}
-                  isBookmarked={bookmarkedIssues.includes(issue.id)}
-                />
-              ))
-            }
-          </div>
-        </div>
+            {totalPages > 1 && (
+              <Pagination>
+                <PaginationContent>
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    className={currentPage === 1 ? "opacity-50 pointer-events-none" : ""}
+                  />
+
+                  <PaginationItem>
+                    Page {currentPage} of {totalPages}
+                  </PaginationItem>
+
+                  <PaginationNext
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    className={
+                      currentPage === totalPages ? "opacity-50 pointer-events-none" : ""
+                    }
+                  />
+                </PaginationContent>
+              </Pagination>
+            )}
+          </>
+        )}
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Exploring
+export default IssueExplorer;
