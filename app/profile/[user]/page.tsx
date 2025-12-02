@@ -11,25 +11,26 @@ import { useEffect } from "react";
 import ProfileSkeleton from "@/app/components/ProfileLoadingSkeleton";
 
 interface Contribution {
-  id: Number,
-  title: String,
-  repository: String,
-  description: String,
-  labels: String[],
-  stars: Number,
-  status: String,
-  url: String,
+  id: number,
+  title: string,
+  repository: string,
+  description: string,
+  labels: string[],
+  stars: number,
+  url: string,
+  status: "completed" | "in-progress" | "pending",
   isBookmarked: boolean,
+  contributedAt: string;
 }
 
 interface Bookmarked {
-  id: Number,
-  title: String,
-  repository: String,
-  description: String,
-  labels: String[],
-  stars: Number,
-  url: String,
+  id: number,
+  title: string,
+  repository: string,
+  description: string,
+  labels: string[],
+  stars: number,
+  url: string,
   isBookmarked: boolean,
 }
 
@@ -179,7 +180,7 @@ const Profile = () => {
                 {contributions.length > 0 ? (
                   <div className="grid gap-4 min-h-screen">
                     {contributions.map((contribution) => (
-                      <ContributionCard key={contribution.id} {...contribution} />
+                      <ContributionCard key={contribution?.id} {...contribution} />
                     ))}
                   </div>
                 ) : (

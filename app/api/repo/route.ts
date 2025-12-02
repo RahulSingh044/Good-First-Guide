@@ -60,3 +60,22 @@ export async function searchRepos(
     const data: SearchReposResponse = await res.json();
     return data;
 }
+
+export async function GET(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+
+        const topics = searchParams.get("topics")
+            ? searchParams.get("topics")!.split(",")
+            : [];
+
+        const page = Number(searchParams.get("page") ?? 1);
+        const perPage = Number(searchParams.get("perPage") ?? 10);
+
+        const result = await searchRepos(topics, page, perPage);
+
+        return Response.json(result);
+    } catch (error) {
+        return Response.json(error);
+    }
+}

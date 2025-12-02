@@ -1,5 +1,3 @@
-// /api/search/route.ts
-
 import { searchRepos } from "../repo/route";
 import { getGoodFirstIssue } from "../issue/route";
 
@@ -39,4 +37,23 @@ export async function getFilteredRepos(
       totalPages: Math.ceil(repoData.total_count / perPage),
     },
   };
+}
+
+export async function GET(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+
+    const topics = searchParams.get("topics")
+      ? searchParams.get("topics")!.split(",")
+      : [];
+
+    const page = Number(searchParams.get("page") ?? 1);
+    const perPage = Number(searchParams.get("perPage") ?? 10);
+
+    const result = await getFilteredRepos(topics, page, perPage);
+
+    return Response.json(result);
+  } catch (error) {
+    return Response.json(error);
+  }
 }
