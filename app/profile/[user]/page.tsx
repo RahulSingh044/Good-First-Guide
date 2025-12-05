@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { Avatar, AvatarImage } from "../../components/ui/avator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
@@ -7,7 +8,9 @@ import { IssueCard } from "../../components/IssueCard";
 import { ContributionCard } from "../../components/ContributionCard";
 import { Github, Mail, Calendar, Bookmark, GitPullRequest } from "lucide-react";
 import { useAuth } from "@/app/hooks/useAuth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"
+import axios from "axios";
 import ProfileSkeleton from "@/app/components/ProfileLoadingSkeleton";
 
 interface Contribution {
@@ -24,11 +27,11 @@ interface Contribution {
 }
 
 interface Bookmarked {
-  id: number,
+  itemId: number,
   title: string,
   repository: string,
   description: string,
-  labels: string[],
+  labels?: string[],
   stars: number,
   url: string,
   isBookmarked: boolean,
@@ -43,30 +46,40 @@ const formatDate = (gmtformat: string = "") => {
   });
 }
 
+interface PageProps {
+  params: Promise<{ user: string }>;
+}
+
 const redirectGithub = (user: String = "") => {
   const redirectLink = `https://github.com/${user}`;
   window.location.href = redirectLink;
 }
 
-const Profile = () => {
+const Profile = ({ params }: PageProps) => {
 
-  const { user } = useAuth();
+  const p = React.use(params);
+  const user = p.user;
+  const { user: loggedInUser } = useAuth();
+  const [bookmarkedIssues, setBookmarkedIssues] = useState<Bookmarked[]>([])
 
   useEffect(() => {
-    if(user)
-      console.log("User info:", user);
-  },[user]);
+    const getBookmarkIssues = async () => {
+      console.log("id", user)
+      const res = await axios.get(`/api/bookmarks?userId=${user}`);
+      setBookmarkedIssues(res.data.bookmarks)
+      console.log("res from profile", res.data);
+    }
 
-  if (!user) {
+    getBookmarkIssues()
+  }, [user])
+
+  if (!loggedInUser) {
     return (
       <>
         <ProfileSkeleton />
       </>
     )
   }
-
-  //Bookmarked issues
-  const bookmarkedIssues: Bookmarked[] = [];
 
   //Contributions
   const contributions: Contribution[] = [];
@@ -83,27 +96,27 @@ const Profile = () => {
           <CardHeader>
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={user.photoURL} />
+                <AvatarImage src={loggedInUser.photoURL} />
               </Avatar>
 
               <div className="flex-1 space-y-3">
-                <div 
-                onClick={() => redirectGithub(user.reloadUserInfo?.screenName)}
-                className="cursor-pointer"
+                <div
+                  onClick={() => redirectGithub(loggedInUser.reloadUserInfo?.screenName)}
+                  className="cursor-pointer"
                 >
-                  <CardTitle className="text-3xl">{user.displayName}</CardTitle>
+                  <CardTitle className="text-3xl">{loggedInUser.displayName}</CardTitle>
                   <CardDescription className="flex flex-wrap items-center gap-4 mt-2">
                     <span className="flex items-center gap-1">
                       <Mail className="h-4 w-4" />
-                      {user.email}
+                      {loggedInUser.email}
                     </span>
                     <span className="flex items-center gap-1 cursor-pointer">
                       <Github className="h-4 w-4" />
-                      @{user.reloadUserInfo?.screenName}
+                      @{loggedInUser.reloadUserInfo?.screenName}
                     </span>
                     <span className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      Joined {formatDate(user.metadata?.creationTime)}
+                      Joined {formatDate(loggedInUser.metadata?.creationTime)}
                     </span>
                   </CardDescription>
                 </div>
@@ -128,7 +141,7 @@ const Profile = () => {
                   <p className="text-xs text-muted-foreground">Completed</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">{bookmarkedIssues.length}</p>
+                  <p className="text-2xl font-bold text-primary">{bookmarkedIssues?.length}</p>
                   <p className="text-xs text-muted-foreground">Bookmarked</p>
                 </div>
               </div>
@@ -147,7 +160,7 @@ const Profile = () => {
             <TabsTrigger value="bookmarks" className="flex items-center gap-2">
               <Bookmark className="h-4 w-4" />
               Bookmarked
-              <Badge variant="secondary" className="ml-1">{bookmarkedIssues.length}</Badge>
+              <Badge variant="secondary" className="ml-1">{bookmarkedIssues?.length}</Badge>
             </TabsTrigger>
           </TabsList>
 
@@ -206,10 +219,25 @@ const Profile = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {bookmarkedIssues.length > 0 ? (
+                {bookmarkedIssues?.length > 0 ? (
                   <div className="grid gap-4">
-                    {bookmarkedIssues.map((issue) => (
-                      <IssueCard key={issue.id} {...issue} />
+                    {bookmarkedIssues.map((b: any) => (
+                      <IssueCard
+                        key={b._id ?? b.itemId}
+                        id={Number(b.itemId ?? b.id)}
+                        title={b.title}
+                        repository={b.repository}
+                        description={b.description}
+                        labels={b.labels || []}
+                        stars={b.stars}
+                        url={b.url}
+                        isBookmarked={true}
+                        onBookmarkToggle={() =>
+                          setBookmarkedIssues((prev) =>
+                            prev.filter((x) => String(x.itemId) !== String(b.itemId))
+                          )
+                        }
+                      />
                     ))}
                   </div>
                 ) : (

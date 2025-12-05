@@ -1,4 +1,3 @@
-
 "use client";
 import Link from 'next/link'
 import { Avatar, AvatarImage } from '../components/ui/avator';

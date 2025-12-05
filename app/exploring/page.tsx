@@ -23,6 +23,15 @@ const IssueExplorer = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
+
+  const toggleBookmark = (id: string) => {
+    setBookmarks(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
 
   useEffect(() => {
     const load = async () => {
@@ -30,7 +39,12 @@ const IssueExplorer = () => {
       try {
         const res = await fetchIssues(selectedSkills, currentPage);
 
-        setIssues(res.issues);
+        setIssues(
+          res.issues.map((issue: any) => ({
+            ...issue,
+            isBookmarked: bookmarks[issue.id] || false
+          }))
+        );
         setTotalPages(res.pagination.totalPages);
         setTotalResults(res.totalSearchResults);
       } catch (e) {
@@ -79,7 +93,8 @@ const IssueExplorer = () => {
 
             <div className="grid md:grid-cols-2 gap-6">
               {issues.map((issue) => (
-                <IssueCard key={issue.id} {...issue} />
+                <IssueCard key={issue.id} {...issue} isBookmarked={bookmarks[issue.id] || false}
+                  onBookmarkToggle={() => toggleBookmark(issue.id)} />
               ))}
             </div>
 

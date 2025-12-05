@@ -1,9 +1,13 @@
+"use client";
 import { Card } from "../components/ui/card";
-import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { ExternalLink, Bookmark, GitBranch, Star } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import axios from "axios";
+import { useState } from "react";
 
 interface IssueCardProps {
+  id: number | string;
   title: string;
   repository: string;
   description: string;
@@ -15,6 +19,7 @@ interface IssueCardProps {
 }
 
 export const IssueCard = ({
+  id,
   title,
   repository,
   description,
@@ -24,6 +29,36 @@ export const IssueCard = ({
   isBookmarked,
   onBookmarkToggle,
 }: IssueCardProps) => {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const handleBookmarkClick = async () => {
+    if (!user) {
+      console.warn("Please login to bookmark");
+      return;
+    }
+
+    onBookmarkToggle?.();
+    setLoading(true);
+
+    try {
+      await axios.post("/api/bookmarks", {
+        userId: user.uid,
+        itemId: id,
+        title,
+        repository,
+        description,
+        stars,
+        url,
+      });
+    } catch (error) {
+      console.error("Bookmark request failed:", error);
+      onBookmarkToggle?.();
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card className="p-6 space-y-4 hover:shadow-xl transition-all duration-300 border-border/50 group">
       <div className="flex items-start justify-between gap-4">
@@ -44,13 +79,14 @@ export const IssueCard = ({
         <Button
           size="icon"
           variant="ghost"
-          className="shrink-0"
-          onClick={onBookmarkToggle}
+          className="shrink-0 cursor-pointer"
+          onClick={handleBookmarkClick}
+          disabled={loading}
+          aria-pressed={!!isBookmarked}
         >
           <Bookmark
-            className={`w-5 h-5 transition-colors ${
-              isBookmarked ? "fill-primary text-primary" : "text-muted-foreground"
-            }`}
+            className={`w-5 h-5 transition-colors ${isBookmarked ? "fill-primary text-primary" : "text-muted-foreground"
+              }`}
           />
         </Button>
       </div>
