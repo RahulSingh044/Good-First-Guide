@@ -59,12 +59,12 @@ const Profile = ({ params }: PageProps) => {
 
   const p = React.use(params);
   const user = p.user;
-  const { user: loggedInUser } = useAuth();
+  const { user: loggedInUser, loading } = useAuth();
+  const router = useRouter();
   const [bookmarkedIssues, setBookmarkedIssues] = useState<Bookmarked[]>([])
 
   useEffect(() => {
     const getBookmarkIssues = async () => {
-      console.log("id", user)
       const res = await axios.get(`/api/bookmarks?userId=${user}`);
       setBookmarkedIssues(res.data.bookmarks)
       console.log("res from profile", res.data);
@@ -73,20 +73,20 @@ const Profile = ({ params }: PageProps) => {
     getBookmarkIssues()
   }, [user])
 
-  if (!loggedInUser) {
-    return (
-      <>
-        <ProfileSkeleton />
-      </>
-    )
-  }
-
   //Contributions
   const contributions: Contribution[] = [];
 
   const completedCount = contributions.filter(c => c.status === "completed").length;
   const inProgressCount = contributions.filter(c => c.status === "in-progress").length;
   const pendingCount = contributions.filter(c => c.status === "pending").length;
+
+  if (!loading && !loggedInUser) {
+    router.push('/');
+  }
+
+  if(loading){
+    return <ProfileSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -96,7 +96,7 @@ const Profile = ({ params }: PageProps) => {
           <CardHeader>
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={loggedInUser.photoURL} />
+                <AvatarImage src={loggedInUser?.photoURL} />
               </Avatar>
 
               <div className="flex-1 space-y-3">
@@ -104,30 +104,22 @@ const Profile = ({ params }: PageProps) => {
                   onClick={() => redirectGithub(loggedInUser.reloadUserInfo?.screenName)}
                   className="cursor-pointer"
                 >
-                  <CardTitle className="text-3xl">{loggedInUser.displayName}</CardTitle>
+                  <CardTitle className="text-3xl">{loggedInUser?.displayName}</CardTitle>
                   <CardDescription className="flex flex-wrap items-center gap-4 mt-2">
                     <span className="flex items-center gap-1">
                       <Mail className="h-4 w-4" />
-                      {loggedInUser.email}
+                      {loggedInUser?.email}
                     </span>
                     <span className="flex items-center gap-1 cursor-pointer">
                       <Github className="h-4 w-4" />
-                      @{loggedInUser.reloadUserInfo?.screenName}
+                      @{loggedInUser?.reloadUserInfo?.screenName}
                     </span>
                     <span className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      Joined {formatDate(loggedInUser.metadata?.creationTime)}
+                      Joined {formatDate(loggedInUser?.metadata?.creationTime)}
                     </span>
                   </CardDescription>
                 </div>
-
-                {/* <div className="flex flex-wrap gap-2">
-                  {user.skills.map((skill) => (
-                    <Badge key={skill} variant="secondary">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div> */}
               </div>
 
               {/* Stats */}

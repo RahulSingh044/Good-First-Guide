@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { Avatar, AvatarImage } from '../components/ui/avator';
 import { Button } from '../components/ui/button';
-import { Bell ,LogOut, Github } from 'lucide-react'
+import { Bell, LogOut, Github } from 'lucide-react'
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from '../hooks/useAuth';
 import { loginWithGithub } from '@/lib/auth';
@@ -47,7 +47,7 @@ function Navbar() {
                     {!loading && (
                         loggedIn ? (
                             <>
-                            <NotificationDropdown />
+                                <NotificationDropdown userId={user.uid} />
                                 <Link href={`/profile/${user.uid}`} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
                                     <Avatar className="h-8 w-8">
                                         <AvatarImage src={user.photoURL} />
@@ -69,7 +69,7 @@ function Navbar() {
                             </Button>
                         )
                     )}
-                    
+
                 </div>
             </div>
         </header >
