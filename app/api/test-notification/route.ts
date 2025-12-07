@@ -11,8 +11,8 @@ export async function GET() {
   await sendNotification(
     testUserId,
     {
-      type: "TEST",
-      message: "This is a test notification sent manually 🎉",
+      type: "Rahul",
+      message: "Haa mitr chal rha hai ki nhi 🎉",
     },
   );
 
