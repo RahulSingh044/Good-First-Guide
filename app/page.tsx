@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useEffect } from "react";
 import { AboutSection } from "./components/AboutSection";
 import { ContributionGuide } from "./components/ContributionGuide";
@@ -7,10 +7,11 @@ import { OpenSourceBenefits } from "./components/OenSourceBenefits";
 
 export default function Home() {
   useEffect(() => {
-    fetch("/api/socket");  // boot socket server
+    fetch("/api/socket");
   }, []);
+  
   return (
-    <div className='min-h-screen'>
+    <div className="min-h-screen">
       <Hero />
       <AboutSection />
       <OpenSourceBenefits />

@@ -6,13 +6,13 @@ export async function GET() {
   await connectDb();
   const res = NextResponse;
 
-  const testUserId = "JEWVXXectzZAttaevyT0GzeMOi23"; // your user _id in DB
+  const testUserId = "srF4BrKEcWNc2dNVgQxrgdcReeq1"; // your user _id in DB
 
   await sendNotification(
     testUserId,
     {
-      type: "Rahul",
-      message: "Haa mitr chal rha hai ki nhi 🎉",
+      type: "Introduction",
+      message: "Hey! Vikas, Welcome to our app! We're excited to have you on board.",
     },
   );
 

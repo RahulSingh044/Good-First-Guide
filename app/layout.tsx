@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 import { ThemeProvider } from "next-themes";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import { Footer } from "./components/Footer";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,6 +21,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Good First Guide",
   description: "Discover Your Perfect Good First Issue",
+  openGraph: {
+    title: "Good First Guide",
+    description: "Discover Your Perfect Good First Issue",
+  },
 };
 
 export default function RootLayout({
