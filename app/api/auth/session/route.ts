@@ -1,18 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyIdToken } from "@/lib/firebase/admin";
+import prisma from "@/lib/prisma";
 
-export async function POST(req:NextRequest) {
-    const { token } = await req.json();
-    const decoded = await verifyIdToken(token);
+export async function POST(req: NextRequest) {
+  const { token } = await req.json();
+  const decoded = await verifyIdToken(token);
 
-    const cookieStore = await cookies();
-    cookieStore.set("session", token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        path: "/",
-    })
+  await prisma.user.upsert({
+    where: { firebaseUid: decoded.uid },
+    update: {
+      email: decoded.email ?? null,
+      name: decoded.name ?? null,
+      photoUrl: decoded.picture ?? null,
+    },
+    create: {
+      firebaseUid: decoded.uid,
+      email: decoded.email ?? null,
+      name: decoded.name ?? null,
+      photoUrl: decoded.picture ?? null,
+    },
+  });
 
-    return NextResponse.json({ uid: decoded.uid });
+  const cookieStore = await cookies();
+  cookieStore.set("session", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+  });
+
+  return NextResponse.json({ uid: decoded.uid });
 }

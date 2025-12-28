@@ -1,5 +1,3 @@
-// actions/getRepo.ts
-
 import { getFilteredRepos } from "../api/search/route";
 
 export interface IssuesResponse {
