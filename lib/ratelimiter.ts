@@ -13,7 +13,7 @@ export function rateLimiter({
 
     const timestamps = rateLimitMap
       .get(ip)
-      .filter(t => now - t < windowMs);
+      .filter((t:number) => now - t < windowMs);
 
     if (timestamps.length >= max) {
       return false; // blocked

@@ -12,8 +12,8 @@ import { useEffect } from "react";
 type Props = {
     user: {
         uid: string;
-        name?: string;
-        avatar?: string;
+        name: string | null;
+        avatar: string | null;
     } | null;
 };
 
@@ -31,9 +31,6 @@ export default function NavbarClient({ user }: Props) {
         router.refresh();
     };
 
-    useEffect(() => {
-        
-    }, [loggedIn])
 
     return loggedIn ? (
         <>
@@ -44,7 +41,7 @@ export default function NavbarClient({ user }: Props) {
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
                 <Avatar className="h-8 w-8 border drop-shadow-2xl">
-                    <AvatarImage src={user?.avatar} alt={user.name}/>
+                    <AvatarImage src={user?.avatar ?? undefined} alt={user?.name ?? undefined}/>
                 </Avatar>
                 <span className="hidden sm:inline">
                     {user.name}
