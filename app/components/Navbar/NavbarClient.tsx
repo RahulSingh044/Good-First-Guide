@@ -7,6 +7,7 @@ import { LogOut, Github } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { loginWithGithub, logoutUser } from "@/lib/auth/client";
 import { NotificationDropdown } from "../NotificationModal";
+import { useEffect } from "react";
 
 type Props = {
     user: {
@@ -29,6 +30,10 @@ export default function NavbarClient({ user }: Props) {
         await logoutUser();
         router.refresh();
     };
+
+    useEffect(() => {
+        
+    }, [loggedIn])
 
     return loggedIn ? (
         <>

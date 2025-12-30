@@ -91,7 +91,7 @@ const IssueExplorer = () => {
               {issues.length} of {totalResults} Issues Found
             </h3> */}
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {issues.map((issue) => (
                 <IssueCard key={issue.id} {...issue} isBookmarked={bookmarks[issue.id] || false}
                   onBookmarkToggle={() => toggleBookmark(issue.id)} />

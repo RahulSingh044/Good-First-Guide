@@ -9,13 +9,25 @@ import { useState } from "react";
 interface IssueCardProps {
   id: number | string;
   title: string;
-  repository: string;
+  repository: string; // should be "owner/repoName"
   description: string;
   labels: string[];
   stars: number;
   url: string;
   isBookmarked?: boolean;
   onBookmarkToggle?: () => void;
+}
+
+export function parseGithubUrl(url: string) {
+  const u = new URL(url);
+  const parts = u.pathname.split("/").filter(Boolean);
+
+  return {
+    owner: parts[0],
+    repo: parts[1],
+    type: parts[2],
+    number: parts[3] ?? null,
+  };
 }
 
 export const IssueCard = ({
@@ -31,6 +43,24 @@ export const IssueCard = ({
 }: IssueCardProps) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+
+  const redirectToVsCode = () => {
+    if (!url) return;
+
+    const { owner, repo, type, number } = parseGithubUrl(url);
+
+    if (!owner || !repo || !number) return;
+
+    const params = new URLSearchParams({
+      owner,
+      repo,
+      issue: number,
+    });
+
+    const vsCodeUrl = `vscode://Orbit-Studio.gfg?${params.toString()}`;
+
+    window.location.href = vsCodeUrl;
+  };
 
   const handleBookmarkClick = async () => {
     if (!user) {
@@ -74,7 +104,9 @@ export const IssueCard = ({
           <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {description}
+          </p>
         </div>
         <Button
           size="icon"
@@ -85,22 +117,28 @@ export const IssueCard = ({
           aria-pressed={!!isBookmarked}
         >
           <Bookmark
-            className={`w-5 h-5 transition-colors ${isBookmarked ? "fill-primary text-primary" : "text-muted-foreground"
-              }`}
+            className={`w-5 h-5 transition-colors ${
+              isBookmarked
+                ? "fill-primary text-primary"
+                : "text-muted-foreground"
+            }`}
           />
         </Button>
       </div>
 
-      <div className="pt-2">
+      <div className="pt-2 flex justify-between items-center gap-3">
         <Button
           variant="outline"
-          className="w-full group/button border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+          className="w-1/2 group/button border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
           asChild
         >
           <a href={url} target="_blank" rel="noopener noreferrer">
             View on GitHub
             <ExternalLink className="w-4 h-4 ml-2 group-hover/button:translate-x-1 transition-transform" />
           </a>
+        </Button>
+        <Button variant="default" className="w-1/2" onClick={redirectToVsCode}>
+          View on VS Code
         </Button>
       </div>
     </Card>
