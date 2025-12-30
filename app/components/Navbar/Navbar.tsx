@@ -8,7 +8,6 @@ export const revalidate = 60;
 export default async function Navbar() {
     const user = await getCurrentUser();
 
-    console.log("user", user)
 
     return (
         <header className="border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
