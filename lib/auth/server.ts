@@ -1,17 +1,22 @@
 import { cookies } from "next/headers";
-import { verifyIdToken } from "@/lib/firebase/admin";
+import { adminAuth } from "@/lib/firebase/admin";
 
 export async function getCurrentUser() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("session")?.value;
-    if (!token) return null;
+  const cookieStore = await cookies();
+  const session = cookieStore.get("session")?.value;
 
-    const decoded = await verifyIdToken(token);
+  if (!session) return null;
 
+  try {
+    const decoded = await adminAuth.verifySessionCookie(session, true);
     return {
-        uid: decoded.uid,
-        name: decoded.name,
-        email: decoded.email,
-        avatar: decoded.picture,
+      uid: decoded.uid,
+      name: decoded.name ?? null,
+      email: decoded.email ?? null,
+      avatar: decoded.picture ?? null,
     };
+  } catch (error) {
+    console.error("Error verifying session:", error);
+    return null;
+  }
 }
