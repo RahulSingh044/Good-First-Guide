@@ -1,17 +1,28 @@
-import { NextResponse } from "next/server";
-import Notification from "@/models/Notifications";
-import { connectDb } from "@/lib/db";
+import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
-    await connectDb();
+  const { userId } = await req.json();
 
-    try {
-        const { userId } = await req.json();
-        if (!userId) return NextResponse.json({ success: false, error: "User Not Logged In" }, { status: 400 });
+  if (!userId) {
+    return new Response(
+      JSON.stringify({ error: "userId is required" }),
+      { status: 400 }
+    );
+  }
 
-        await Notification.updateMany({userId, read: false}, { read: true, readAt: new Date() });
-        return NextResponse.json({ success: true });
-    } catch (err: any) {
-        return NextResponse.json({ success: false, error: err.message }, { status: 500 });
-    }
+  const result = await prisma.notification.updateMany({
+    where: {
+      userId,
+      read: false,
+    },
+    data: {
+      read: true,
+      readAt: new Date(),
+    },
+  });
+
+  return Response.json({
+    success: true,
+    updated: result.count,
+  });
 }

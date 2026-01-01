@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { Button } from "../components/ui/button";
@@ -9,53 +10,70 @@ import {
 } from "../components/ui/popover";
 import { Badge } from "../components/ui/badge";
 import { ScrollArea } from "../components/ui/scrollArea";
-
+import { useNotifications } from "../hooks/useNotification";
 
 type Noti = {
-  _id: string;
+  id: string;
   message: string;
   type: string;
   read: boolean;
   createdAt: string;
-  meta?: any;
 };
 
 export const NotificationDropdown = ({ userId }: { userId: string }) => {
   const [list, setList] = useState<Noti[]>([]);
 
+  /** 🔹 initial fetch */
   async function fetchNoti() {
     const res = await fetch(`/api/notifications?userId=${userId}`);
     const data = await res.json();
     if (data.success) setList(data.notifications);
   }
 
-  async function markRead(id: string) {
+  /** 🔹 realtime notifications */
+  const { notifications } = useNotifications(userId);
+
+  /** 🔹 merge realtime notifications into list */
+  useEffect(() => {
+    if (!notifications.length) return;
+
+    setList((prev) => {
+      const existing = new Set(prev.map((n) => n.id));
+      const fresh = notifications.filter((n) => !existing.has(n.id));
+      return [...fresh, ...prev];
+    });
+  }, [notifications]);
+
+  /** 🔹 mark ALL notifications as read */
+  async function markAllRead() {
+    if (!userId) return;
+
     await fetch("/api/notifications/read", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: id }),
+      body: JSON.stringify({ userId }),
     });
-    setList((s) => s.map(n => n._id === id ? { ...n, read: true } : n));
+
+    setList((prev) => prev.map((n) => ({ ...n, read: true })));
   }
 
-  const unreadCount = list.filter(n => !n.read).length;
+  const unreadCount = list.filter((n) => !n.read).length;
 
+  /** 🔹 initial load */
   useEffect(() => {
     if (!userId) return;
     fetchNoti();
-
-    const handler = (e: any) => {
-      // when socket emits, re-fetch list
-      fetchNoti();
-    };
-    window.addEventListener("gfg:notification", handler);
-    return () => window.removeEventListener("gfg:notification", handler);
-  }, [userId, unreadCount]);
+  }, [userId]);
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button onClick={() => markRead(userId)} variant="ghost" size="icon" className="relative cursor-pointer">
+        <Button
+          onClick={markAllRead}
+          variant="ghost"
+          size="icon"
+          className="relative"
+        >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center">
@@ -64,52 +82,37 @@ export const NotificationDropdown = ({ userId }: { userId: string }) => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0 pb-3" align="end">
-        <div className="flex items-center justify-between p-4 border-b border-border">
-          <h4 className="font-semibold text-foreground">Notifications</h4>
+
+      <PopoverContent align="end" sideOffset={8} className="w-80 p-0 pb-3">
+        <div className="flex items-center justify-between p-4 border-b">
+          <h4 className="font-semibold">Notifications</h4>
           {unreadCount > 0 && (
             <Badge variant="secondary">{unreadCount} new</Badge>
           )}
         </div>
+
         <ScrollArea className="h-[300px]">
-          {list.length > 0 ? (
-            <div className="divide-y divide-border">
-              {list.map((notification) => (
-                <div
-                  key={notification._id}
-                  className={`p-3 hover:bg-muted/50 cursor-pointer transition-colors ${!notification.read ? "bg-muted/30" : ""
-                    }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-sm text-sm text-foreground font-bold">
-                          {notification.type}
-                        </p>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {new Date(notification.createdAt).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                  {!notification.read && <button onClick={() => markRead(notification._id)} style={{ marginTop: 6 }}>Mark as read</button>}
-                </div>
-              ))}
-            </div>
+          {list.length ? (
+            list.map((n) => (
+              <div
+                key={n.id}
+                className={`p-4 border-b ${
+                  !n.read ? "bg-muted/30" : ""
+                }`}
+              >
+                <p className="font-medium">{n.type}</p>
+                <p className="text-sm text-muted-foreground">{n.message}</p>
+                <p className="text-xs mt-1">
+                  {new Date(n.createdAt).toLocaleString()}
+                </p>
+              </div>
+            ))
           ) : (
-            <div className="p-8 text-center text-muted-foreground">
+            <p className="p-6 text-center text-muted-foreground">
               No notifications yet
-            </div>
+            </p>
           )}
         </ScrollArea>
-        {/* <div className="p-2 border-t border-border">
-          <Button variant="ghost" className="w-full text-sm">
-            View all notifications
-          </Button>
-        </div> */}
       </PopoverContent>
     </Popover>
   );

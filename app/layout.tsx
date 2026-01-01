@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar/Navbar";
 import { Footer } from "./components/Footer";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,6 +45,7 @@ export default function RootLayout({
             <Analytics />
             <Footer />
           </Theme>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

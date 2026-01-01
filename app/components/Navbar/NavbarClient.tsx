@@ -7,7 +7,7 @@ import { LogOut, Github } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { loginWithGithub, logoutUser } from "@/lib/auth/client";
 import { NotificationDropdown } from "../NotificationModal";
-import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 type Props = {
     user: {
@@ -23,11 +23,13 @@ export default function NavbarClient({ user }: Props) {
 
     const handleLogin = async () => {
         await loginWithGithub();
+        toast.success("Welcome Back 👋");
         router.refresh(); 
     };
 
     const handleLogout = async () => {
         await logoutUser();
+        toast.success("Logged Out")
         router.refresh();
     };
 

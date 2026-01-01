@@ -20,19 +20,24 @@ enum STATUS {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  firebaseUid String   @unique
-  email       String   @unique
+  id          String         @id @default(uuid())
+  firebaseUid String         @unique
+  email       String         @unique
   name        String
   photoUrl    String
-  issues      Issues[]
-  createdAt   DateTime @default(now())
+  createdAt   DateTime       @default(now())
+
+  // relations
+  issues        Issue[]
+  notifications Notification[]
+  bookmarks     Bookmark[]
 }
 
-model Issues {
+model Issue {
   id             String   @id @default(uuid())
   userId         String
-  user           User     @relation(fields: [userId], references: [id])
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   githubUserName String
   issueNumber    String
   issueTitle     String
@@ -40,4 +45,40 @@ model Issues {
   startedAt      DateTime @default(now())
 
   @@unique([githubUserName, issueNumber])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type      String
+  message   String
+  meta      Json?
+  read      Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([read])
+}
+
+model Bookmark {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  itemId       String
+  title        String?
+  repository   String
+  description  String
+  stars        Int
+  url          String
+  isBookmarked Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, itemId])
+  @@index([userId])
 }
