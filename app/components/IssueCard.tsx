@@ -57,7 +57,7 @@ export const IssueCard = ({
       issue: number,
     });
 
-    const vsCodeUrl = `vscode://Orbit-Studio.gfg?${params.toString()}`;
+    const vsCodeUrl = `vscode://OrbitStudio.gfg?${params.toString()}`;
 
     window.location.href = vsCodeUrl;
   };
