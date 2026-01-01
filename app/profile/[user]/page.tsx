@@ -65,9 +65,15 @@ const Profile = ({ params }: PageProps) => {
 
   useEffect(() => {
     const getBookmarkIssues = async () => {
-      const res = await axios.get(`/api/bookmarks?userId=${user}`);
-      setBookmarkedIssues(res.data.bookmarks)
-      console.log("res from profile", res.data);
+      const res = await fetch(`/api/bookmarks?userId=${user}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+      setBookmarkedIssues(data.bookmarks)
     }
 
     getBookmarkIssues()
@@ -84,7 +90,7 @@ const Profile = ({ params }: PageProps) => {
     router.push('/');
   }
 
-  if(loading){
+  if (loading) {
     return <ProfileSkeleton />;
   }
 
@@ -94,26 +100,35 @@ const Profile = ({ params }: PageProps) => {
         {/* User Profile Card */}
         <Card>
           <CardHeader>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <Avatar className="h-24 w-24">
+            <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
+              {/* Avatar */}
+              <Avatar className="h-24 w-24 mx-auto md:mx-0">
                 <AvatarImage src={loggedInUser?.photoURL} />
               </Avatar>
 
+              {/* User Info */}
               <div className="flex-1 space-y-3">
                 <div
-                  onClick={() => redirectGithub(loggedInUser.reloadUserInfo?.screenName)}
-                  className="cursor-pointer"
+                  onClick={() =>
+                    redirectGithub(loggedInUser.reloadUserInfo?.screenName)
+                  }
+                  className="cursor-pointer flex flex-col items-center md:items-start"
                 >
-                  <CardTitle className="text-3xl">{loggedInUser?.displayName}</CardTitle>
-                  <CardDescription className="flex flex-wrap items-center gap-4 mt-2">
+                  <CardTitle className="text-3xl">
+                    {loggedInUser?.displayName}
+                  </CardTitle>
+
+                  <CardDescription className="flex flex-col sm:flex-row flex-wrap items-center md:items-start justify-center md:justify-start gap-2 mt-2">
                     <span className="flex items-center gap-1">
                       <Mail className="h-4 w-4" />
                       {loggedInUser?.email}
                     </span>
+
                     <span className="flex items-center gap-1 cursor-pointer">
                       <Github className="h-4 w-4" />
                       @{loggedInUser?.reloadUserInfo?.screenName}
                     </span>
+
                     <span className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
                       Joined {formatDate(loggedInUser?.metadata?.creationTime)}
@@ -123,21 +138,30 @@ const Profile = ({ params }: PageProps) => {
               </div>
 
               {/* Stats */}
-              <div className="flex gap-6 md:gap-8">
+              <div className="flex justify-center md:justify-start gap-6 md:gap-8 w-full md:w-auto">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">{contributions.length}</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {contributions.length}
+                  </p>
                   <p className="text-xs text-muted-foreground">Contributions</p>
                 </div>
+
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{completedCount}</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {completedCount}
+                  </p>
                   <p className="text-xs text-muted-foreground">Completed</p>
                 </div>
+
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-primary">{bookmarkedIssues?.length}</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {bookmarkedIssues?.length}
+                  </p>
                   <p className="text-xs text-muted-foreground">Bookmarked</p>
                 </div>
               </div>
             </div>
+
           </CardHeader>
         </Card>
 

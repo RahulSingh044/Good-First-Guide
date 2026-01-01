@@ -3,7 +3,7 @@ import { Github, Twitter, Mail, Heart } from "lucide-react";
 export const Footer = () => {
   return (
     <footer className="border-t border-border bg-secondary/20 mt-20">
-      <div className="container mx-auto px-4 py-12">
+      <div className="container px-4 py-12">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div className="space-y-4">
