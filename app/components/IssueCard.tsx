@@ -42,12 +42,14 @@ export const IssueCard = ({
   onBookmarkToggle,
 }: IssueCardProps) => {
   const { user } = useAuth();
+  const { owner, repo, type, number } = parseGithubUrl(url);
   const [loading, setLoading] = useState(false);
+  const [btnLoading, setBtnLoading] = useState(false);
 
   const redirectToVsCode = () => {
     if (!url) return;
 
-    const { owner, repo, type, number } = parseGithubUrl(url);
+    
 
     if (!owner || !repo || !number) return;
 
@@ -57,10 +59,45 @@ export const IssueCard = ({
       issue: number,
     });
 
+
     const vsCodeUrl = `vscode://OrbitStudio.gfg?${params.toString()}`;
 
     window.location.href = vsCodeUrl;
   };
+
+const handleIssueInDb = async () => {
+  setBtnLoading(true);
+
+  try {
+    const res = await fetch("/api/user/issue", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user.uid,
+        githubUserName: user.reloadUserInfo.screenName,
+        issueNumber: number,
+        issueTitle: title,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to create issue");
+    }
+
+    redirectToVsCode();
+
+    // console.log("Issue saved:", data);
+  } catch (error) {
+    console.error("Unable to Store the Issue", error);
+  } finally {
+    setBtnLoading(false);
+  }
+};
+
 
   const handleBookmarkClick = async () => {
     if (!user) {
@@ -137,8 +174,8 @@ export const IssueCard = ({
             <ExternalLink className="w-4 h-4 ml-2 group-hover/button:translate-x-1 transition-transform" />
           </a>
         </Button>
-        <Button variant="default" className="w-1/2" onClick={redirectToVsCode}>
-          View on VS Code
+        <Button variant="default" className="w-1/2" onClick={handleIssueInDb}>
+          { btnLoading ? "loading..." : "View on VS code"}
         </Button>
       </div>
     </Card>

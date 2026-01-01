@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     } else {
       await prisma.user.create({
         data: {
+          id: decoded.uid,
           firebaseUid: decoded.uid,
           email: decoded.email ?? "",
           name: decoded.name ?? "",

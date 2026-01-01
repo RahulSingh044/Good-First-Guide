@@ -13,11 +13,31 @@ datasource db {
   provider = "postgresql"
 }
 
+enum STATUS {
+  STARTED
+  PR_OPENED
+  MERGED
+}
+
 model User {
-  id          String  @id @default(uuid())
+  id          String   @id @default(uuid())
   firebaseUid String   @unique
-  email       String
+  email       String   @unique
   name        String
   photoUrl    String
+  issues      Issues[]
   createdAt   DateTime @default(now())
+}
+
+model Issues {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  githubUserName String
+  issueNumber    String
+  issueTitle     String
+  status         STATUS
+  startedAt      DateTime @default(now())
+
+  @@unique([githubUserName, issueNumber])
 }
