@@ -21,7 +21,7 @@ export const POST = async (req: NextRequest) => {
     }
 
     // 📝 Create Issue
-    const issue = await prisma.issues.create({
+    const issue = await prisma.issue.create({
       data: {
         userId,
         githubUserName,
