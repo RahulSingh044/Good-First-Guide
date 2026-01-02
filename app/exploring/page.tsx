@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "../components/ui/input";
 import { Search } from "lucide-react";
 import { IssueCard } from "../components/IssueCard";
@@ -13,6 +13,7 @@ import {
 } from "../components/ui/pagination";
 import { fetchIssues } from "../actions/getRepo";
 import ExploreSkeleton from "../components/IssueExplorerSkeleton";
+import { useDebounce } from "../hooks/useDebouncing";
 
 const IssueExplorer = () => {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -24,6 +25,8 @@ const IssueExplorer = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
+  
+  const debounceSearch = useDebounce(searchQuery, 500);
 
   const toggleBookmark = (id: string) => {
     setBookmarks(prev => ({
@@ -33,11 +36,13 @@ const IssueExplorer = () => {
   };
 
 
+
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetchIssues(selectedSkills, currentPage);
+        const topic = debounceSearch && debounceSearch.trim().length > 0 ? [debounceSearch.trim()] : selectedSkills;
+        const res = await fetchIssues(topic, currentPage);
 
         setIssues(
           res.issues.map((issue: any) => ({
@@ -55,7 +60,7 @@ const IssueExplorer = () => {
     };
 
     load();
-  }, [selectedSkills, currentPage]);
+  }, [selectedSkills, currentPage, debounceSearch]);
 
   return (
     <section className="py-20 px-4 bg-linear-to-b from-background to-secondary/30">
