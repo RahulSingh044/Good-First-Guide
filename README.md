@@ -112,21 +112,14 @@ To become the **default gateway to open source** – blending discovery, automat
 ### Web Platform
 
 ```bash
-git clone https://github.com/your-org/gfg.git
-cd gfg
+git clone https://github.com/RahulSingh044/Good-First-Guide.git
+cd Good-First-Guide
 npm install
 npm run dev
 ```
 
 ### VS Code Extension
-
-```bash
-git clone https://github.com/your-org/gfg-vscode-extension.git
-cd gfg-vscode-extension
-npm install
-npm run compile
-code --install-extension .
-```
+<img width="1544" height="1027" alt="image" src="https://github.com/user-attachments/assets/6916bbe6-81bc-4c00-ab29-f8d128cc4688" />
 
 ---
 
@@ -161,15 +154,6 @@ If GFG sparks joy in your OSS journey:
 ---
 
 **Thank you for making open source more welcoming. Let's code the world better – together!** 🚀❤️
-
----
-
-### 📞 Connect With Us
-
-- 🌐 **Website**: [gfg.dev](https://gfg.dev)
-- 💬 **Discord**: [Join our community](https://discord.gg/gfg)
-- 🐦 **Twitter**: [@GFG_OpenSource](https://twitter.com/GFG_OpenSource)
-- 📧 **Email**: hello@gfg.dev
 
 ---
 
