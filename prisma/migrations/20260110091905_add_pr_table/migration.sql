@@ -1,0 +1,29 @@
+-- CreateTable
+CREATE TABLE "PR" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "issueId" TEXT NOT NULL,
+    "prdata" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PR_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "gitDiff" (
+    "id" TEXT NOT NULL,
+    "useId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "gitDiff_pkey" PRIMARY KEY ("id")
+);
+
+-- AddForeignKey
+ALTER TABLE "PR" ADD CONSTRAINT "PR_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PR" ADD CONSTRAINT "PR_issueId_fkey" FOREIGN KEY ("issueId") REFERENCES "Issue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "gitDiff" ADD CONSTRAINT "gitDiff_useId_fkey" FOREIGN KEY ("useId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
