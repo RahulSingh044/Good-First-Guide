@@ -60,54 +60,61 @@ export const IssueCard = ({
     const params = new URLSearchParams({
       owner,
       repo,
-      issue: number,
+      issueNumber: number,
+      userId: user?.uid,
+      githubUserName: user?.reloadUserInfo?.screenName,
+      issueTitle: title,
     });
 
+    console.log("external vs", `vscode://OrbitStudio.gfg?${params.toString()}`)
     window.location.href = `vscode://OrbitStudio.gfg?${params.toString()}`;
   };
 
   /* -------------------------- Save Issue + Notify --------------------------- */
 
-  const handleIssueInDb = async () => {
-    if (!user) {
-      toast.error("Login first to access this");
-      return;
-    }
+  // const handleIssueInDb = async (userId: string, issueNumber: string, issueTitle: string, githubUserName: string) => {
+  //   if (!user) {
+  //     toast.error("Login first to access this");
+  //     return;
+  //   }
 
-    setBtnLoading(true);
+  //   setBtnLoading(true);
 
-    try {
-      const res = await fetch("/api/user/issue", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.uid,
-          githubUserName: user.reloadUserInfo?.screenName,
-          issueNumber: number,
-          issueTitle: title,
-        }),
-      });
+  //   try {
+  //     const res = await fetch("/api/user/issue", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         userId,
+  //         githubUserName,
+  //         issueNumber,
+  //         issueTitle,
+  //       }),
+  //     });
 
-      if (!res.ok) throw new Error("Failed to save issue");
+  //     const data = await res.json();
 
-      redirectToVsCode();
+  //     if (!data.success) throw new Error("Failed to save issue");
 
-      await fetch("/api/notifications/cloned", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user.uid,
-          repo,
-          title,
-        }),
-      });
-    } catch (err) {
-      console.error(err);
-      toast.error("Unable to process issue");
-    } finally {
-      setBtnLoading(false);
-    }
-  };
+  //     await fetch("/api/notifications/cloned", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         userId: user.uid,
+  //         repo,
+  //         title,
+  //       }),
+  //     });
+
+  //     return data.data;
+
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error("Unable to process issue");
+  //   } finally {
+  //     setBtnLoading(false);
+  //   }
+  // };
 
   /* ------------------------------ Bookmark ------------------------------ */
 
@@ -126,13 +133,13 @@ export const IssueCard = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.uid,       
-          itemId: id,             
-          title,                  
-          repository,            
-          description,            
-          stars,                  
-          url,                  
+          userId: user.uid,
+          itemId: id,
+          title,
+          repository,
+          description,
+          stars,
+          url,
         }),
       });
 
@@ -191,8 +198,8 @@ export const IssueCard = ({
         >
           <Bookmark
             className={`w-5 h-5 transition-colors ${isBookmarked
-                ? "fill-primary text-primary"
-                : "text-muted-foreground"
+              ? "fill-primary text-primary"
+              : "text-muted-foreground"
               }`}
           />
         </Button>
@@ -213,7 +220,7 @@ export const IssueCard = ({
         <Button
           variant="default"
           className="w-1/2 hidden md:block"
-          onClick={handleIssueInDb}
+          onClick={redirectToVsCode}
           disabled={btnLoading}
         >
           {btnLoading ? "Loading..." : "View on VS Code"}

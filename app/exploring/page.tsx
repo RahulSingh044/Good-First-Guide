@@ -25,7 +25,7 @@ const IssueExplorer = () => {
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(false);
   const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
-  
+
   const debounceSearch = useDebounce(searchQuery, 500);
 
   const toggleBookmark = (id: string) => {
@@ -64,7 +64,7 @@ const IssueExplorer = () => {
 
   return (
     <section className="py-20 px-4 bg-linear-to-b from-background to-secondary/30">
-      <div className="container mx-auto max-w-7xl space-y-12">
+      <div className="px-10 max-w-8xl space-y-12">
 
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />

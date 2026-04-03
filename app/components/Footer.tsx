@@ -2,11 +2,11 @@ import { Github, Twitter, Mail, Heart } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-border bg-secondary/20 mt-20">
-      <div className="container px-4 py-12">
+    <footer className="min-w-screen border-t border-border bg-secondary/20 mt-20">
+      <div className="px-20 py-12">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* About */}
-          <div className="space-y-4">
+          <div className="space-y-4 w-1/2">
             <h3 className="font-bold text-lg">Good First Guide</h3>
             <p className="text-sm text-muted-foreground">
               Helping developers make their first open source contributions with confidence.
@@ -109,7 +109,7 @@ export const Footer = () => {
         {/* Bottom bar */}
         <div className="pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>© 2025 Good First Guide. All rights reserved.</p>
+            <p>© 2026 Good First Guide. All rights reserved.</p>
             <p className="flex items-center gap-1">
               Made with <Heart className="w-4 h-4 text-red-500 fill-current" /> for the open source community
             </p>

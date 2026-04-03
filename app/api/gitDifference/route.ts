@@ -6,10 +6,8 @@ export const POST = async (req: NextRequest) => {
         const body = await req.json();
         const {
             diff,
-            insertions,
-            deletions,
-            repoName,
-            repoOwner,
+            repo,
+            owner,
             issueId,
         } = body;
 
@@ -37,17 +35,13 @@ export const POST = async (req: NextRequest) => {
             },
             update: {
                 diff,
-                insertions,
-                deletions,
-                repoOwner,
-                repoName,
+                repoOwner: owner,
+                repoName: repo,
             },
             create: {
                 diff,
-                insertions,
-                deletions,
-                repoOwner,
-                repoName,
+                repoOwner: owner,
+                repoName: repo,
                 issue: {
                     connect: { id: issueId },
                 },
